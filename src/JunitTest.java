@@ -13,7 +13,13 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.Keys;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 
 
 
@@ -156,21 +162,100 @@ public class JunitTest {
       w8();
       driver.get("https://online.idea.rs/");
       driver.manage().window().setSize(new Dimension(1920, 1040));
-      driver.findElement(By.cssSelector(".input:nth-child(2)")).click();
-      w8();
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".input:nth-child(2)"))).click();
+
       driver.findElement(By.cssSelector(".input:nth-child(2)")).sendKeys("plazma");
-      w8();
-      driver.findElement(By.cssSelector(".selected")).click();
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".selected"))).click();
       driver.findElement(By.cssSelector(".desktop")).click();
 
       wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div:nth-child(1) > .col-lg-2 .add-to-cart > span"))).click();
-      driver.findElement(By.cssSelector("div:nth-child(2) > .col-lg-2 .add-to-cart > span")).click();
-      driver.findElement(By.cssSelector("div:nth-child(3) > .col-lg-2 .add-to-cart > span")).click();
-      w8();
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div:nth-child(2) > .col-lg-2 .add-to-cart > span"))).click();
+      wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div:nth-child(3) > .col-lg-2 .add-to-cart > span"))).click();
+
+      w8();w8();
       assertEquals(driver.findElement(By.cssSelector(".total-price")).getText(),"2,264.97 din\n0.00 din");
+      assertEquals(driver.findElement(By.cssSelector("div:nth-child(1) > .im-slide .akcija")).getText(),"499.99 din");
+      assertEquals(driver.findElement(By.cssSelector("div:nth-child(2) > .im-slide .akcija")).getText(),"1,499.99 din");
+      assertEquals(driver.findElement(By.cssSelector("div:nth-child(3) > .im-slide .akcija")).getText(),"264.99 din");
+
+      
 
     }
     
+
+    
+    @Test
+    public void AvgSpeed() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        
+        TestLogIn();
+        w8();
+        long startTime = System.currentTimeMillis();
+
+        driver.get("https://online.idea.rs/");
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".news-icon"))).click();
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("body")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".action-icon > p"))).click();
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("body")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".favorit-icon > p"))).click();
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("body")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("aleksakovacevicc@gmail.com"))).click();
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("body")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".promjena-podataka-button"))).click();
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("body")));
+
+
+
+
+        long endTime = System.currentTimeMillis();
+        long pageLoadTime = endTime - startTime;
+
+        long avg = pageLoadTime/6;
+        assertTrue(avg<5000); 
+        
+    }
+    
+
+    
+    @Test
+    public void WriteReport() {
+    	driver.get("https://online.idea.rs/");
+
+    	String tekst = driver.findElement(By.cssSelector("p:nth-child(8)")).getText() + "\n" +
+        driver.findElement(By.cssSelector("p:nth-child(7)")).getText();
+
+
+        WriteInFile("test-report.txt", tekst);
+        assertFalse(tekst.isEmpty());
+
+    }
+    
+    @Test
+    public void DeleteItem() {
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+      TestLogIn();
+      w8();
+      driver.get("https://online.idea.rs/");
+      driver.manage().window().setSize(new Dimension(1920, 1040));
+      driver.findElement(By.cssSelector(".cart-icon > p")).click();
+      w8();
+      driver.findElement(By.cssSelector("div:nth-child(1) > .im-slide .delete-cart-item")).click();
+      w8();
+      driver.findElement(By.cssSelector("div:nth-child(1) > .im-slide .delete-cart-item")).click();
+      w8();
+      driver.findElement(By.cssSelector(".delete-cart-item")).click();
+
+      w8();
+      driver.close();
+    }
+    
+    private void WriteInFile(String putanja, String tekst) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(putanja))) {
+            writer.write(tekst);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     public void w8() {
         try {
