@@ -1,3 +1,5 @@
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -14,6 +16,12 @@ public class AllTests {
         Result result = JUnitCore.runClasses(AllTests.class);
         Logger log = Logger.getLogger(AllTests.class.getName());
 
+        log.setLevel(Level.INFO);
+
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.ALL);
+        log.addHandler(consoleHandler);
+        
         for (Failure f : result.getFailures()) {
             log.warning(f.toString());
         }

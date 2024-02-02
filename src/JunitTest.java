@@ -3,7 +3,10 @@ import static org.junit.Assert.*;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -18,7 +21,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 
 
@@ -30,9 +32,45 @@ import java.util.concurrent.TimeUnit;
 
 public class JunitTest {
 
+	public String info = "";
     private WebDriver driver;
     private String chromeDriverPath = "E:\\Selenium\\ChromeDeveloper\\chromedriver-win64\\chromedriver-win64\\chromedriver.exe";
 
+    @Rule
+    public TestWatcher testWatcher = new TestWatcher() {
+        @Override
+        protected void starting(final Description description) {
+            String methodName = description.getMethodName();
+            String className = description.getClassName();
+            className = className.substring(className.lastIndexOf('.') + 1);
+            System.err.println("\u001B[37mStarting JUnit-test: \u001B[32m" + methodName);
+
+            
+            
+            
+        }
+
+        @Override
+        protected void succeeded(Description description) {
+            String methodName = description.getMethodName();
+            System.err.println("\u001B[37mTest je uspesno zavrsen. \nNaziv testa: \u001B[32m" + methodName);
+            info += "\n"+" Test" +methodName+" je uspesno prosao";
+            WriteInFile("test-report.txt", methodName+"Test je uspesno prosao\n");
+
+        }
+
+        @Override
+        protected void failed(Throwable e, Description description) {
+            String methodName = description.getMethodName();
+            System.out.println("\u001B[31m" + methodName + " nije prosao.\u001B[0m");
+            info += "\n"+" Test" +methodName+" nije uspesno prosao";
+            WriteInFile("test-report.txt", methodName+"Test nije uspesno prosao");
+
+
+        }
+    };
+
+    
     @Before
     public void setUp() {
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
@@ -51,7 +89,6 @@ public class JunitTest {
     @Test
     public void testRegister() {
     	
-
         driver.get("https://online.idea.rs/#!/");
         driver.manage().window().setSize(new Dimension(1920, 1040));
         driver.findElement(By.linkText("Registracija")).click();
@@ -95,8 +132,9 @@ public class JunitTest {
           driver.findElement(By.id("houseNumber")).sendKeys("66");
           driver.findElement(By.cssSelector(".has-error label")).click();
           driver.findElement(By.name("submit")).click();
-          
 
+          String tekstDesc = "[Testiranje registracije]";
+          WriteInFile("test-report.txt", tekstDesc);
         
         assertEquals("https://online.idea.rs/#!/account/new", driver.getCurrentUrl());
     }
@@ -113,9 +151,12 @@ public class JunitTest {
         driver.findElement(By.id("password")).sendKeys("Aleksa123");
         driver.findElement(By.id("password")).sendKeys(Keys.ENTER);
         
+        String tekstDesc = "[Testira prijave korisnika]";
+        WriteInFile("test-report.txt", tekstDesc);
+        
+        
         assertEquals("https://online.idea.rs/#!/login", driver.getCurrentUrl());
         
-    	
     }
 
     
@@ -126,10 +167,12 @@ public class JunitTest {
       w8();
       driver.get("https://online.idea.rs/");
       driver.manage().window().setSize(new Dimension(1920, 1040));
-    
       driver.findElement(By.linkText("aleksakovacevicc@gmail.com")).click();
       w8();
       driver.findElement(By.cssSelector(".osobni-podaci > a:nth-child(3)")).click();
+      
+      String tekstDesc = "[Testiranje odjavljivanje sa naloga]";
+      WriteInFile("test-report.txt", tekstDesc);
       
       assertEquals("https://online.idea.rs/#!/account/show?activeTab=orders", driver.getCurrentUrl());
 
@@ -150,6 +193,9 @@ public class JunitTest {
       assertEquals(driver.findElement(By.cssSelector(".row:nth-child(2) > .col-md-10 b")).getText(),"07.12.2001.");
       assertEquals(driver.findElement(By.cssSelector(".row:nth-child(3) b")).getText(),"+381616386025");
       assertEquals(driver.findElement(By.cssSelector("b > span")).getText(),"aleksakovacevicc@gmail.com");
+      
+      String tekstDesc = "[Testira validacije podataka korisnika]";
+      WriteInFile("test-report.txt", tekstDesc);
 
 
     }
@@ -172,13 +218,14 @@ public class JunitTest {
       wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div:nth-child(2) > .col-lg-2 .add-to-cart > span"))).click();
       wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div:nth-child(3) > .col-lg-2 .add-to-cart > span"))).click();
 
-      w8();w8();
-      assertEquals(driver.findElement(By.cssSelector(".total-price")).getText(),"2,264.97 din\n0.00 din");
-      assertEquals(driver.findElement(By.cssSelector("div:nth-child(1) > .im-slide .akcija")).getText(),"499.99 din");
+      w8();w8();w8();
+      assertEquals(driver.findElement(By.cssSelector(".total-price")).getText(),"2,184.97 din\n0.00 din");
+      assertEquals(driver.findElement(By.cssSelector("div:nth-child(1) > .im-slide .akcija")).getText(),"AKCIJA 419.99 din");
       assertEquals(driver.findElement(By.cssSelector("div:nth-child(2) > .im-slide .akcija")).getText(),"1,499.99 din");
       assertEquals(driver.findElement(By.cssSelector("div:nth-child(3) > .im-slide .akcija")).getText(),"264.99 din");
-
       
+      String tekstDesc = "[Testiranje dodavanje artikala u korpi i testiranje krajnju cene]";
+      WriteInFile("test-report.txt", tekstDesc);
 
     }
     
@@ -204,35 +251,24 @@ public class JunitTest {
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".promjena-podataka-button"))).click();
         wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("body")));
 
-
-
-
         long endTime = System.currentTimeMillis();
         long pageLoadTime = endTime - startTime;
 
         long avg = pageLoadTime/6;
-        assertTrue(avg<5000); 
         
+        String tekstDesc = "[Testiranje prosecne brzine odziva sajta]";
+        WriteInFile("test-report.txt", tekstDesc);
+        
+        assertTrue(avg<5000); 
+           
     }
     
 
     
-    @Test
-    public void WriteReport() {
-    	driver.get("https://online.idea.rs/");
 
-    	String tekst = driver.findElement(By.cssSelector("p:nth-child(8)")).getText() + "\n" +
-        driver.findElement(By.cssSelector("p:nth-child(7)")).getText();
-
-
-        WriteInFile("test-report.txt", tekst);
-        assertFalse(tekst.isEmpty());
-
-    }
     
     @Test
     public void DeleteItem() {
-      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
       TestLogIn();
       w8();
       driver.get("https://online.idea.rs/");
@@ -247,15 +283,39 @@ public class JunitTest {
 
       w8();
       driver.close();
+      
+      String tekstDesc = "[Testiranje brisanja artikla iz korpe]";
+      WriteInFile("test-report.txt", tekstDesc);
     }
     
+    @Test
+    public void WriteReport() {
+    	driver.get("https://online.idea.rs/");
+    	
+    	String tekst = "Osvnovni podaci o kompaniji \n"+"---------------------------------"+ "\n"
+    	+driver.findElement(By.cssSelector("p:nth-child(8)")).getText() + "\n\n" 
+    	+driver.findElement(By.cssSelector("p:nth-child(7)")).getText()+"\n"+"---------------------------------" + "\n";
+    	
+
+        WriteInFile("test-report.txt", tekst);
+        
+        String tekstDesc = "[Testiranje pisanja podataka u fajlu]";
+        WriteInFile("test-report.txt", tekstDesc);
+        
+        assertFalse(tekst.isEmpty());       
+
+    }
+    
+    
     private void WriteInFile(String putanja, String tekst) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(putanja))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(putanja, true))) {
             writer.write(tekst);
+            writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     
     public void w8() {
         try {

@@ -1,12 +1,46 @@
+Osvnovni podaci o kompaniji 
+---------------------------------
 Mercator-S d.o.o.
 Autoput za Zagreb, Beograd
 Matični broj: 06886671
 PIB: 101670560
 Prodajni objekat 281, online Beograd
 Bulevar umetnosti 4, Beograd
+
 Mercator-S d.o.o.
 Autoput za Zagreb, Beograd
 Matični broj: 06886671
 PIB: 101670560
 Prodajni objekat 553, online Novi Sad
 Bulevar oslobođenja 102, Novi Sad
+---------------------------------
+
+[Testiranje pisanja podataka u fajlu]
+WriteReportTest je uspesno prosao
+
+[Testira prijave korisnika]
+[Testira validacije podataka korisnika]
+testUserTest je uspesno prosao
+
+[Testira prijave korisnika]
+[Testiranje dodavanje artikala u korpi i testiranje krajnju cene]
+testShoppingCartTest je uspesno prosao
+
+[Testira prijave korisnika]
+[Testiranje brisanja artikla iz korpe]
+DeleteItemTest je uspesno prosao
+
+[Testiranje registracije]
+testRegisterTest je uspesno prosao
+
+[Testira prijave korisnika]
+TestLogInTest je uspesno prosao
+
+[Testira prijave korisnika]
+[Testiranje odjavljivanje sa naloga]
+testLogOutTest je uspesno prosao
+
+[Testira prijave korisnika]
+[Testiranje prosecne brzine odziva sajta]
+AvgSpeedTest je uspesno prosao
+
